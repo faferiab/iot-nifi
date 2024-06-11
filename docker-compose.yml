@@ -1,0 +1,46 @@
+services:
+  broker:
+    extends:
+      file: mosquitto.yml
+      service: mosquitto
+    networks:
+      - mqttnet
+
+  management:
+    extends:
+      file: apache_nifi.yml
+      service: apache_nifi
+    ports:
+    - 8443:8443
+    volumes:
+    - ./nifi/data:/opt/nifi/nifi-current/data
+    environment:
+      SINGLE_USER_CREDENTIALS_USERNAME: admin
+      SINGLE_USER_CREDENTIALS_PASSWORD: ctsBtRBKHRAx69EqUghvvgEvjnaLjFEB
+    networks:
+      - mqttnet
+
+  database:
+    extends:
+      file: influx.yml
+      service: influxdb
+    ports:
+    - 8086:8086
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: influx_username
+      DOCKER_INFLUXDB_INIT_PASSWORD: influx_password
+      DOCKER_INFLUXDB_INIT_ORG: influx_org
+      DOCKER_INFLUXDB_INIT_BUCKET: iot_data
+    networks:
+      - mqttnet
+    volumes:
+      - influx-data:/var/lib/influxdb2
+      - influx-config:/etc/influxdb2
+
+networks:
+  mqttnet:
+
+volumes:
+  influx-data:
+  influx-config:

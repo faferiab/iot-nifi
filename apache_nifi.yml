@@ -1,0 +1,7 @@
+services:
+  apache_nifi:
+    image: apache/nifi:1.26.0
+    volumes:
+      - ./nifi/nar_extensions:/opt/nifi/nifi-current/extensions
+    entrypoint: ["sh", "-c", "cp -a /opt/nifi/nifi-current/extensions/. /opt/nifi/nifi-current/lib/ && ../scripts/start.sh"]
+    restart: unless-stopped
